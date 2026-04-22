@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>고객용</title></head>
+<body>
+    <h2>🚚 견적 요청하기</h2>
+    <input type="text" id="item" placeholder="짐 이름을 쓰세요">
+    <button onclick="send()">전송</button>
+    <script>
+        function send() {
+            const item = document.getElementById('item').value;
+            fetch('/api/order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({item: item, price: '180,000원'})
+            }).then(() => alert('기사님께 전송되었습니다!'));
+        }
+    </script>
+</body>
+</html>

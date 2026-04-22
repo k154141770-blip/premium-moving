@@ -1,0 +1,79 @@
+2. 기사용 화면 (templates/admin.html)
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>기사님 오더 보드</title>
+
+</head>
+
+<body style="font-family:sans-serif; padding:20px; background-color: #e9ecef; margin: 0;">
+
+<h2 style="text-align: center; color: #343a40; margin-top: 20px;">📲다가오더 현황</h2>
+
+<div id="order-list" style="max-width: 600px; margin: auto;">
+
+{% 주문 시 %}
+
+{% 주문 내 순서 지정 %}
+
+<div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+
+<div style="display: flex; justify-content: space-between;">
+
+<h3 style="margin: 0; color: #005088;">📦 {{ order.item }}</h3>
+
+<span style="background: #eee; padding: 5px 10px; border-radius: 20px; font-size: 14px;">{{ order.status }}</span>
+
+</div>
+
+<p style="font-size: 20px; font-weight: bold; margin: 15px 0;">운송비: {{ order.price }}</p>
+
+{% if order.status == '대기중' %}
+
+<button onclick="accept({{ order.id }})" style="width: 100%; padding: 12px; background:#11caa0; color:white; border:none; border-radius:8px; font-size: 16px; font-weight: bold; cursor: pointer;">주문 수락하기</button>
+
+{% endif %}
+
+</div>
+
+{% endfor %}
+
+{% 또 다른 %}
+
+<p style="text-align: center; padding: 50px; color: #888;">현재 대기 중인 오더는 없습니다.</p>
+
+{% endif %}
+
+</div>
+
+<script>
+
+함수 accept(id) {
+
+fetch('/api/accept/' + id, {method: 'POST'})
+
+.then(res => res.json())
+
+.then(data => {
+
+if(data.status === 'success') { Alert('배차가 완료되었습니다!'); 위치.재로드(); }
+
+그렇지 않으면 { alert(data.message); location.reload(); }
+
+});
+
+}
+
+</script>
+
+</body>
+
+</html>

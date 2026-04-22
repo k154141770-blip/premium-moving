@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>프리미엄 운송 견적</title>
+</head>
+<body style="font-family:sans-serif; padding:20px; max-width: 500px; margin: auto; background-color: #f4f7f6;">
+    <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <h2 style="color: #005088; text-align: center;">🚚 프리미엄 운송 견적</h2>
+        <p style="text-align: center; color: #666;">AS 경력 전문가의 안전한 이동</p>
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+        
+        <label style="font-weight:bold;">운송 품목</label>
+        <input type="text" id="item" placeholder="예: 75인치 TV, 비스포크 냉장고" style="width:100%; padding:12px; margin: 10px 0 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+        
+        <button onclick="sendOrder()" style="width:100%; padding:15px; background:#005088; color:white; border:none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer;">
+            견적 요청하기
+        </button>
+    </div>
+
+    <script>
+        function sendOrder() {
+            const item = document.getElementById('item').value;
+            if(!item) return alert('품목을 입력해 주세요.');
+            
+            fetch('/api/order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({item: item, price: '180,000원'})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === 'success') {
+                    alert('견적이 전송되었습니다! 기사님이 곧 확인합니다.');
+                    document.getElementById('item').value = ''; 
+                }
+            })
+            .catch(err => alert('연결 오류가 발생했습니다.'));
+        }
+    </script>
+</body>
+</html>

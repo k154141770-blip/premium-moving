@@ -3,84 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>프리미엄 운송 견적</title>
+    <title>기사님 관리자 모드</title>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif; 
-            background-color: #f2f5f8; 
-            margin: 0; padding: 20px; 
-            display: flex; justify-content: center; align-items: center; min-height: 100vh; 
+            background-color: #e9ecef; margin: 0; padding: 15px; 
         }
-        .main-card { 
-            background: #ffffff; width: 100%; max-width: 480px; 
-            padding: 40px 25px; border-radius: 30px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
+        .header { 
+            background: #005088; color: white; padding: 20px; 
+            border-radius: 15px; text-align: center; margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        .header-section { text-align: center; margin-bottom: 35px; }
-        .header-section h1 { color: #005088; font-size: 28px; margin: 0 0 10px 0; }
-        .header-section p { color: #777; font-size: 16px; margin: 0; line-height: 1.5; }
+        .header h2 { margin: 0; font-size: 22px; }
         
-        .input-group { margin-bottom: 30px; }
-        .input-group label { display: block; font-weight: bold; margin-bottom: 12px; color: #333; font-size: 17px; }
-        .input-group input { 
-            width: 100%; padding: 20px; border: 2px solid #eee; 
-            border-radius: 16px; font-size: 18px; outline: none; background-color: #fafafa;
+        .order-card { 
+            background: white; border-radius: 18px; padding: 20px; 
+            margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-left: 8px solid #005088;
         }
-        .input-group input:focus { border-color: #005088; background-color: #fff; }
+        .order-info { margin-bottom: 15px; }
+        .order-item { font-size: 20px; font-weight: bold; color: #333; margin-bottom: 5px; }
+        .order-price { font-size: 24px; color: #d63031; font-weight: 800; }
         
-        .submit-btn { 
-            width: 100%; padding: 22px; background: #005088; color: white; 
-            border: none; border-radius: 18px; font-size: 20px; font-weight: bold; 
-            cursor: pointer; box-shadow: 0 8px 20px rgba(0,80,136,0.25);
+        .status-badge {
+            display: inline-block; padding: 5px 12px; border-radius: 20px;
+            font-size: 13px; font-weight: bold; background: #eee; margin-bottom: 10px;
         }
-        .submit-btn:active { transform: scale(0.97); background: #003a63; }
+
+        .accept-btn { 
+            width: 100%; padding: 18px; background: #11caa0; color: white; 
+            border: none; border-radius: 12px; font-size: 18px; font-weight: bold; 
+            cursor: pointer; transition: 0.2s;
+        }
+        .accept-btn:active { background: #0da885; transform: scale(0.98); }
         
-        .info-text { text-align: center; margin-top: 25px; font-size: 14px; color: #aaa; }
+        .no-order { text-align: center; padding: 50px; color: #888; font-size: 16px; }
     </style>
 </head>
 <body>
-    <div class="main-card">
-        <div class="header-section">
-            <h1>🚚 프리미엄 운송</h1>
-            <p>AS 경력 전문가가 직접 배차합니다<br>안전하고 정확한 이동 서비스</p>
-        </div>
-        <div class="input-group">
-            <label>무엇을 옮겨드릴까요?</label>
-            <input type="text" id="item_name" placeholder="예: 75인치 TV, 안마의자 등" autocomplete="off">
-        </div>
-        <button class="submit-btn" onclick="requestOrder()">무료 견적 요청하기</button>
-        <div class="info-text">요청 즉시 기사님 관리 화면으로 전송됩니다.</div>
+    <div class="header">
+        <h2>📲 실시간 오더 게시판</h2>
+    </div>
+
+    <div id="order-container">
+        {% if orders %}
+            {% for order in orders %}
+            <div class="order-card">
+                <div class="status-badge">{{ order.status }}</div>
+                <div class="order-info">
+                    <div class="order-item">📦 {{ order.item }}</div>
+                    <div class="order-price">운송비: {{ order.price }}</div>
+                </div>
+                
+                {% if order.status == '대기중' %}
+                <button class="accept-btn" onclick="acceptOrder({{ order.id }})">오더 수락하기</button>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-order">현재 들어온 오더가 없습니다.</div>
+        {% endif %}
     </div>
 
     <script>
-        function requestOrder() {
-            const inputField = document.getElementById('item_name');
-            const itemName = inputField.value.trim();
-            if(!itemName) { alert('운송하실 물품 이름을 입력해주세요!'); return; }
+        function acceptOrder(id) {
+            if(!confirm('이 오더를 수락하시겠습니까?')) return;
             
-            const btn = document.querySelector('.submit-btn');
-            btn.innerText = '신청 접수 중...';
-            btn.disabled = true;
-
-            fetch('/api/order', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({item: itemName, price: '상담 후 결정'})
-            })
+            fetch('/api/accept/' + id, { method: 'POST' })
             .then(res => res.json())
             .then(data => {
                 if(data.status === 'success') {
-                    alert('신청이 완료되었습니다!\n기사님이 확인 후 바로 연락드리겠습니다.');
-                    inputField.value = '';
+                    alert('배차가 완료되었습니다! 고객님께 연락하세요.');
+                    location.reload();
+                } else {
+                    alert('이미 완료된 오더이거나 오류가 발생했습니다.');
                 }
             })
-            .catch(err => alert('연결이 불안정합니다.'))
-            .finally(() => {
-                btn.innerText = '무료 견적 요청하기';
-                btn.disabled = false;
-            });
+            .catch(err => alert('서버 연결 오류'));
         }
+        
+        // 30초마다 자동으로 새로고침해서 새 오더 확인
+        setTimeout(() => location.reload(), 30000);
     </script>
 </body>
 </html>

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>기사용</title></head>
+<body>
+    <h2>📲 실시간 오더 현황</h2>
+    {% for order in orders %}
+    <div style="border:1px solid #000; margin:10px; padding:10px;">
+        <p>물건: {{ order.item }} | 가격: {{ order.price }}</p>
+        <button onclick="location.reload()">수락</button>
+    </div>
+    {% endfor %}
+</body>
+</html>
